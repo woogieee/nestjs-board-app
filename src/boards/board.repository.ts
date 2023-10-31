@@ -4,7 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateBoardDto } from './dto/create-board.dto';
 import { BoardStatus } from './board-status.enum';
 
-//@EntityRepository(Board)
+//@EntityRepository(Board)  TypeORM 0.3.0 이후 버전으로 사용 불가능
 @Injectable()
 //사용자 정의 저장소로 선언
 export class BoardRepository extends Repository<Board> {
@@ -14,11 +14,11 @@ export class BoardRepository extends Repository<Board> {
   constructor(dataSource: DataSource) {
     super(Board, dataSource.createEntityManager());
   }
+  //Injectable 변경으로 인한 코드 추가 종료
 
   async getBoardById(id: number) {
     return await this.findOneBy({ id });
   }
-  //Injectable 변경으로 인한 코드 추가 종료
 
   //게시판 생성 Service 가져오기 시작
   async createBoard(createBoardDto: CreateBoardDto): Promise<Board> {
@@ -27,7 +27,7 @@ export class BoardRepository extends Repository<Board> {
     const board = this.create({
       title,
       description,
-      status: BoardStatus.PUBLIC,
+      status: BoardStatus.PUBLIC
     });
 
     await this.save(board);

@@ -34,7 +34,7 @@ module.exports = {
         //들여쓰기는 2칸(space 2칸)
         endOfLine: 'auto',
         //띄어쓰기 경고 Delete`cr`해결
-        trailingComma: 'all',
+        trailingComma: 'none',
         //여러줄을 사용할때 후행 콤마 사용방식
         // printWidth: 80
         // //한줄에 글자수 80개

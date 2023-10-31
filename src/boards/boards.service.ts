@@ -13,7 +13,7 @@ export class BoardsService {
   // //boards는 배열로 되어있기 때문에 타입을 Board [] 배열로 지정해 줘야 됨
   constructor(
     @InjectRepository(BoardRepository)
-    private boardRepository: BoardRepository,
+    private boardRepository: BoardRepository
   ) {}
   //InjectRepository를 이용해서 이 서비스에서 BoardRepository를 이용함
 
