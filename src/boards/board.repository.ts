@@ -3,6 +3,7 @@ import { Board } from './board.entity';
 import { Injectable } from '@nestjs/common';
 import { CreateBoardDto } from './dto/create-board.dto';
 import { BoardStatus } from './board-status.enum';
+import { User } from 'src/auth/user.entity';
 
 //@EntityRepository(Board)  TypeORM 0.3.0 이후 버전으로 사용 불가능
 @Injectable()
@@ -21,13 +22,17 @@ export class BoardRepository extends Repository<Board> {
   }
 
   //게시판 생성 Service 가져오기 시작
-  async createBoard(createBoardDto: CreateBoardDto): Promise<Board> {
+  async createBoard(
+    createBoardDto: CreateBoardDto,
+    user: User
+  ): Promise<Board> {
     const { title, description } = createBoardDto;
 
     const board = this.create({
       title,
       description,
-      status: BoardStatus.PUBLIC
+      status: BoardStatus.PUBLIC,
+      user
     });
 
     await this.save(board);

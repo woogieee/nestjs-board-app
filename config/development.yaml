@@ -1,0 +1,9 @@
+db:
+  host: 'localhost'
+  username: 'postgresql'
+  password: 'postgresql'
+  synchronize: true
+  # synchronize가 true로 되어있으면 시작할때마다 새롭게 entity를 보고서 생성해줌
+
+jwt:
+  secret: 'hklogistics'

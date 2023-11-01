@@ -5,14 +5,17 @@ import { UserRepository } from './user.repository';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy';
+import * as config from 'config';
+
+const jwtConfig = config.get('jwt');
 
 @Module({
   imports: [
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
-      secret: 'hklogistics', //토큰 생성용 시크릿 키, 원하는 값을 넣어주면 됨
+      secret: process.env.JWT_SECRET || jwtConfig.secret, //토큰 생성용 시크릿 키, 원하는 값을 넣어주면 됨
       signOptions: {
-        expiresIn: 3600 //토큰 유효시간 단위(초)
+        expiresIn: jwtConfig.expiresIn //토큰 유효시간 단위(초)
       }
     })
   ],

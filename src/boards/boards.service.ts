@@ -4,6 +4,7 @@ import { BoardRepository } from './board.repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Board } from './board.entity';
 import { BoardStatus } from './board-status.enum';
+import { User } from 'src/auth/user.entity';
 //uuid 버전1을 사용하면서 이름은 uuid로 하겠다
 
 @Injectable()
@@ -21,8 +22,15 @@ export class BoardsService {
   //   //리턴값도 배열로 받아야되기 때문에 타입을 지정해 줌
   //   return this.boards;
   // }
-  async getAllBoards(): Promise<Board[]> {
-    return this.boardRepository.find();
+  async getAllBoards(user: User): Promise<Board[]> {
+    const query = this.boardRepository.createQueryBuilder('board');
+    //board table에서 쿼리 사용
+
+    query.where('board.userId = :userId', { userId: user.id });
+
+    const boards = await query.getMany();
+
+    return boards;
   }
 
   // //게시글 작성
@@ -38,8 +46,8 @@ export class BoardsService {
   //   this.boards.push(board);
   //   return board;
   // }
-  createBoard(createBoardDto: CreateBoardDto): Promise<Board> {
-    return this.boardRepository.createBoard(createBoardDto);
+  createBoard(createBoardDto: CreateBoardDto, user: User): Promise<Board> {
+    return this.boardRepository.createBoard(createBoardDto, user);
   }
 
   // //아이디로 게시글 가져오기
@@ -68,8 +76,13 @@ export class BoardsService {
   //   this.boards = this.boards.filter((board) => board.id !== found.id);
   //   //아이디가 다른것만 남겨준다
   // }
-  async deleteBoard(id: number): Promise<void> {
-    const result = await this.boardRepository.delete(id);
+  async deleteBoard(id: number, user: User): Promise<void> {
+    const result = await this.boardRepository.delete({
+      id,
+      user: {
+        id: user.id
+      }
+    });
 
     if (result.affected === 0) {
       throw new NotFoundException(`Can't find Board with id ${id}`);

@@ -6,7 +6,8 @@ import {
   Param,
   ParseIntPipe,
   Post,
-  UseGuards
+  UseGuards,
+  Logger
 } from '@nestjs/common';
 import { UsePipes, ValidationPipe, Patch } from '@nestjs/common';
 import { BoardsService } from './boards.service';
@@ -15,10 +16,13 @@ import { CreateBoardDto } from './dto/create-board.dto';
 import { BoardStatusValidationPipe } from './pipes/board-status-validation.pipe';
 import { Board } from './board.entity';
 import { AuthGuard } from '@nestjs/passport';
+import { GetUser } from 'src/auth/get-user.decorator';
+import { User } from 'src/auth/user.entity';
 
 @Controller('boards')
 @UseGuards(AuthGuard())
 export class BoardsController {
+  private logger = new Logger('BoardsController');
   constructor(private boardsService: BoardsService) {}
   // //게시글 불러오기
   // @Get('/')
@@ -26,8 +30,9 @@ export class BoardsController {
   //   return this.boardsService.getAllBoards();
   // }
   @Get()
-  getAllBoard(): Promise<Board[]> {
-    return this.boardsService.getAllBoards();
+  getAllBoard(@GetUser() user: User): Promise<Board[]> {
+    this.logger.verbose(`User ${user.username} trying to get all boards`);
+    return this.boardsService.getAllBoards(user);
   }
 
   // //게시글 작성
@@ -38,8 +43,13 @@ export class BoardsController {
   // }
   @Post()
   @UsePipes(ValidationPipe)
-  createBoard(@Body() createBoardDto: CreateBoardDto): Promise<Board> {
-    return this.boardsService.createBoard(createBoardDto);
+  createBoard(
+    @Body() createBoardDto: CreateBoardDto,
+    @GetUser() user: User
+  ): Promise<Board> {
+    this.logger.verbose(`User ${user.username} creating a new board.
+    Payload: ${JSON.stringify(createBoardDto)}`);
+    return this.boardsService.createBoard(createBoardDto, user);
   }
 
   // //아이디로 게시글 가져오기
@@ -59,8 +69,11 @@ export class BoardsController {
   //   this.boardsService.deleteBoard(id);
   // }
   @Delete('/:id')
-  deleteBoard(@Param('id', ParseIntPipe) id): Promise<void> {
-    return this.boardsService.deleteBoard(id);
+  deleteBoard(
+    @Param('id', ParseIntPipe) id,
+    @GetUser() user: User
+  ): Promise<void> {
+    return this.boardsService.deleteBoard(id, user);
   }
 
   // //특정 게시글 업데이트
